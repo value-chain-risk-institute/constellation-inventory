@@ -42,6 +42,6 @@ Each component carries `vcri:evidence`:
 
 ## Status
 
-v0.1.0, 2026-10-16. Output validates against the CycloneDX 1.6 JSON schema (strict). Tested on Python 3.14; written for 3.8 but not yet run on it.
+v0.1.0, 2026-10-16. Output validates against the CycloneDX 1.6 JSON schema (strict). Run on Python 3.12 and 3.14; the source parses under the Python 3.8 grammar, but has not been run on a 3.8 interpreter yet.
 
 The Value Chain Risk Institute. Code under Apache-2.0. Marpet-Viktor.
