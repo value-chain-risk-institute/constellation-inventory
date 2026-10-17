@@ -40,8 +40,14 @@ import sys
 import uuid
 
 TOOL_NAME = "vcri-constellation-inventory"
-TOOL_VERSION = "0.1.0"
+TOOL_VERSION = "0.1.1"
 NS = "vcri"  # property namespace
+VCRI = "The Value Chain Risk Institute"
+TAGLINE = "Inside data, not guesses."
+VCRI_URL = "https://valuechainrisk.org"
+REPO_URL = "https://github.com/value-chain-risk-institute/constellation-inventory"
+CREDIT = "Constellation Inventory by %s. %s %s" % (VCRI, TAGLINE, VCRI_URL)
+# Text only: these strings are written into the output. Nothing is fetched.
 
 # Manifest role -> CycloneDX 1.6 component type.
 ROLE_TYPES = {
@@ -306,12 +312,15 @@ def build(args):
         "metadata": {
             "timestamp": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "tools": {"components": [{"type": "application", "name": TOOL_NAME, "version": TOOL_VERSION,
-                                      "supplier": {"name": "The Value Chain Risk Institute"}}]},
+                                      "description": CREDIT,
+                                      "supplier": {"name": VCRI, "url": [VCRI_URL]},
+                                      "externalReferences": [{"type": "website", "url": VCRI_URL},
+                                                             {"type": "vcs", "url": REPO_URL}]}]},
             "component": {"type": "application", "bom-ref": root_ref,
                           "name": agent.get("name", "agent"),
                           "version": str(agent.get("version", "")),
                           "description": agent.get("description", "")},
-            "properties": meta_props + ([prop("agent:owner", agent["owner"])] if agent.get("owner") else []),
+            "properties": [prop("generated-by", CREDIT)] + meta_props + ([prop("agent:owner", agent["owner"])] if agent.get("owner") else []),
         },
         "components": comps,
         "dependencies": [{"ref": root_ref, "dependsOn": [c["bom-ref"] for c in comps]}],
@@ -326,6 +335,7 @@ def build(args):
     gaps = find_gaps(bom)
     if gaps:
         print("%d gap(s); run `check` for the list" % len(gaps), file=sys.stderr)
+    print(CREDIT, file=sys.stderr)
 
 
 # ---------------- check / diff ----------------
@@ -366,6 +376,7 @@ def check(args):
         print("  no gaps against the required fields")
     print("Note: this checks completeness of what was listed. It cannot know about a component "
           "nobody listed. Run with --discover where MCP clients are in use.")
+    print(CREDIT)
     sys.exit(1 if (gaps and args.strict) else 0)
 
 
@@ -398,6 +409,7 @@ def diff(args):
                 what.append("hash %s -> %s" % (a[key][1][:12] or "-", b[key][1][:12] or "-"))
             print("CHANGED  %-12s %s: %s" % (role, name, "; ".join(what))); changed += 1
     print("%d change(s)" % changed)
+    print(CREDIT)
     sys.exit(1 if changed else 0)
 
 
